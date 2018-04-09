@@ -26,7 +26,7 @@ class Annotation {
 	boolean empty
 
 	Entity entity
-	
+
 	ImportManager importManager
 
 	Annotation(Entity entity, String name) {
@@ -37,7 +37,7 @@ class Annotation {
 		this(entity.importManager, name, empty)
 		this.entity = entity
 	}
-	
+
 	Annotation(ImportManager importer, String name, boolean empty) {
 		this.importManager = importer
 		this.name = "@" + importer.importType(name)
@@ -91,13 +91,17 @@ class Annotation {
 	}
 
 	Annotation add(String param, List<?> values, boolean quote, boolean unwrapSingle) {
+		add(param, values, quote, unwrapSingle, true);
+	}
+
+	Annotation add(String param, List<?> values, boolean quote, boolean unwrapSingle, boolean importTypes) {
 		if (values == null)
 			return this;
 
 		values = values.collect {
 			if (it instanceof Annotation)
 				return it
-			quote ? this.quote(it) : importManager.importType(it)
+			quote ? this.quote(it) : (importTypes ? importManager.importType(it) : it)
 		}
 
 		def value = unwrapSingle && values.size() == 1 ? values[0] : wrap(values)
